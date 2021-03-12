@@ -12,26 +12,30 @@ namespace WebApi.Controllers
         [HttpGet("{id}")]
         public ActionResult<string> Get(int id)
         {
-            using (var process = new Process())
+            using var process = new Process
             {
-                process.StartInfo.FileName = @"..\HelloWorld\bin\Debug\helloworld.exe";
-                process.StartInfo.Arguments = $"{id}";
-                //process.StartInfo.FileName = @"cmd.exe";
-                //process.StartInfo.Arguments = @"/c dir";      // print the current working directory information
-                process.StartInfo.CreateNoWindow = true;
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.RedirectStandardError = true;
+                StartInfo =
+                {
+                    FileName = @"..\HelloWorld\bin\Debug\helloworld.exe",
+                    Arguments = $"{id}",
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                }
+            };
+            //process.StartInfo.FileName = @"cmd.exe";
+            //process.StartInfo.Arguments = @"/c dir";      // print the current working directory information
 
-                process.OutputDataReceived += (sender, data) => Console.WriteLine(data.Data);
-                process.ErrorDataReceived += (sender, data) => Console.WriteLine(data.Data);
-                Console.WriteLine("starting");
-                process.Start();
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-                var exited = process.WaitForExit(1000 * 10);     // (optional) wait up to 10 seconds
-                Console.WriteLine($"exit {exited}");
-            }
+            process.OutputDataReceived += (_, data) => Console.WriteLine(data.Data);
+            process.ErrorDataReceived += (_, data) => Console.WriteLine(data.Data);
+            Console.WriteLine("starting");
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+            var exited = process.WaitForExit(1000 * 10);     // (optional) wait up to 10 seconds
+            Console.WriteLine($"exit {exited}");
+
             return "value";
         }
     }
